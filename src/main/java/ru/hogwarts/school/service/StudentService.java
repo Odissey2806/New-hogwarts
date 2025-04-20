@@ -2,45 +2,43 @@ package ru.hogwarts.school.service;
 
 import org.springframework.stereotype.Service;
 import ru.hogwarts.school.model.Student;
-import java.util.HashMap;
-import java.util.Map;
+import ru.hogwarts.school.repository.StudentRepository;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class StudentService {
-    private final Map<Long, Student> students = new HashMap<>();
-    private long lastId = 0;
+    private final StudentRepository studentRepository;
 
-    public Student addStudent(Student student) {
-        student.setId(++lastId);
-        students.put(lastId, student);
-        return student;
+    public StudentService(StudentRepository studentRepository) {
+        this.studentRepository = studentRepository;
     }
 
-    public Student findStudent(long id) {
-        return students.get(id);
+    public Student createStudent(Student student) {
+        return studentRepository.save(student);
     }
 
-    public Student editStudent(Student student) {
-        students.put(student.getId(), student);
-        return student;
+    public Optional<Student> findStudentById(Long id) {
+        return studentRepository.findById(id);
     }
 
-    public Student deleteStudent(long id) {
-        return students.remove(id);
+    public Student updateStudent(Student student) {
+        return studentRepository.save(student);
     }
 
-    public Map<Long, Student> getAllStudents() {
-        return students;
+    public void deleteStudentById(Long id) {
+        studentRepository.deleteById(id);
     }
 
-    // Фильтрация по возрасту
-    public Map<Long, Student> filterByAge(int age) {
-        Map<Long, Student> filtered = new HashMap<>();
-        for (Map.Entry<Long, Student> entry : students.entrySet()) {
-            if (entry.getValue().getAge() == age) {
-                filtered.put(entry.getKey(), entry.getValue());
-            }
-        }
-        return filtered;
+    public List<Student> findStudentsByAge(int age) {
+        return studentRepository.findAllByAge(age);
+    }
+
+    public List<Student> findStudentsByAgeBetween(int minAge, int maxAge) {
+        return studentRepository.findAllByAgeBetween(minAge, maxAge);
+    }
+
+    public List<Student> findStudentsByHouse(String house) {
+        return studentRepository.findAllByHouseIgnoreCase(house);
     }
 }

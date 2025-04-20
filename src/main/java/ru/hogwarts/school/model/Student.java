@@ -1,11 +1,22 @@
 package ru.hogwarts.school.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
+@Entity
 public class Student {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     private int age;
     private String house;       // Поле факультет (Гриффиндор, Слизерин и т.д.)
     private String pet;         // Поле питомец (сова, кот, жаба)
+
+    public Student() {
+    }
 
     public Student(Long id, String name, int age, String house, String pet) {
         this.id = id;
