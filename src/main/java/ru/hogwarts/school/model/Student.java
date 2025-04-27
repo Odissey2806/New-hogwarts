@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class Student {
@@ -12,18 +13,21 @@ public class Student {
     private Long id;
     private String name;
     private int age;
-    private String house;       // Поле факультет (Гриффиндор, Слизерин и т.д.)
-    private String pet;         // Поле питомец (сова, кот, жаба)
+    private String pet;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "faculty_id")
+    private Faculty faculty;
 
     public Student() {
     }
 
-    public Student(Long id, String name, int age, String house, String pet) {
+    public Student(Long id, String name, int age, String pet, Faculty faculty) {
         this.id = id;
         this.name = name;
         this.age = age;
-        this.house = house;
         this.pet = pet;
+        this.faculty = faculty;
     }
 
     public Long getId() {
@@ -50,19 +54,19 @@ public class Student {
         this.age = age;
     }
 
-    public String getHouse() {
-        return house;
-    }
-
-    public void setHouse(String house) {
-        this.house = house;
-    }
-
     public String getPet() {
         return pet;
     }
 
     public void setPet(String pet) {
         this.pet = pet;
+    }
+
+    public Faculty getFaculty() {
+        return faculty;
+    }
+
+    public void setFaculty(Faculty faculty) {
+        this.faculty = faculty;
     }
 }
