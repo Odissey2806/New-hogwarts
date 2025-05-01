@@ -41,8 +41,8 @@ public class FacultyService {
     }
 
     public List<Faculty> findFacultiesByNameOrColor(String name, String color) {
-        String searchName = (name != null && !name.isBlank()) ? name : null;
-        String searchColor = (color != null && !color.isBlank()) ? color : null;
+        String searchName = (name != null && !name.trim().isEmpty()) ? name : null;
+        String searchColor = (color != null && !color.trim().isEmpty()) ? color : null;
 
         if (searchName != null && searchColor != null) {
             return facultyRepository.findAllByNameIgnoreCaseOrColorIgnoreCase(searchName, searchColor);
