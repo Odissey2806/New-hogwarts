@@ -10,6 +10,5 @@ import java.util.Optional;
 public interface StudentRepository extends JpaRepository<Student, Long> {
     List<Student> findAllByAge(int age);
     List<Student> findAllByAgeBetween(int minAge, int maxAge);
-    List<Student> findAllByHouseIgnoreCase(String house);
-    Optional<Student> findFirstByNameIgnoreCase(String name);
+    List<Student> findByFaculty_Id(Long facultyId);
 }

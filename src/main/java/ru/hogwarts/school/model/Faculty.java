@@ -4,6 +4,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import java.util.List;
 
 @Entity
 public class Faculty {
@@ -12,10 +14,14 @@ public class Faculty {
     private Long id;
     private String name;
     private String color;
-    private String founder;     // Поле 1: основатель факультета
-    private int studentsCount;  // Поле 2: количество студентов
+    private String founder;
+    private int studentsCount;
+
+    @OneToMany(mappedBy = "faculty", fetch = FetchType.LAZY)
+    private List<Student> students;
 
     public Faculty() {
+
     }
 
     public Faculty(Long id, String name, String color, String founder, int studentsCount) {
@@ -64,5 +70,13 @@ public class Faculty {
 
     public void setStudentsCount(int studentsCount) {
         this.studentsCount = studentsCount;
+    }
+
+    public List<Student> getStudents() {
+        return students;
+    }
+
+    public void setStudents(List<Student> students) {
+        this.students = students;
     }
 }

@@ -1,8 +1,10 @@
 package ru.hogwarts.school.controller;
 
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.hogwarts.school.exception.ResourceNotFoundException;
 import ru.hogwarts.school.model.Faculty;
+import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.service.FacultyService;
 import java.util.List;
 
@@ -16,30 +18,31 @@ public class FacultyController {
     }
 
     @PostMapping
-    public Faculty addFaculty(@RequestBody Faculty faculty) {
-        return facultyService.createFaculty(faculty);
+    @ResponseStatus(HttpStatus.CREATED)
+    public Long addFaculty(@RequestBody Faculty faculty) {
+        Faculty createdFaculty = facultyService.createFaculty(faculty);
+        return createdFaculty.getId();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Faculty> getFaculty(@PathVariable Long id) {
-        Faculty faculty = facultyService.findFacultyById(id)
-                .orElse(null);
-
-        if (faculty == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(faculty);
+    public Faculty getFaculty(@PathVariable Long id) {
+        return facultyService.findFacultyById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Факультет с id " + id + " не найден"));
     }
 
     @PutMapping
     public Faculty updateFaculty(@RequestBody Faculty faculty) {
-        return facultyService.updateFaculty(faculty);
+        return facultyService.findFacultyById(faculty.getId())
+                .map(existingFaculty -> facultyService.updateFaculty(faculty))
+                .orElseThrow(() -> new ResourceNotFoundException("Факультет для обновления с id " + faculty.getId() + " не найден"));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteFaculty(@PathVariable Long id) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteFaculty(@PathVariable Long id) {
+        facultyService.findFacultyById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Факультет для удаления с id " + id + " не найден"));
         facultyService.deleteFacultyById(id);
-        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/color/{color}")
@@ -50,15 +53,13 @@ public class FacultyController {
     @GetMapping("/search")
     public List<Faculty> searchFaculties(@RequestParam(required = false) String name,
                                          @RequestParam(required = false) String color) {
-        if (name != null && color != null) {
-            return facultyService.findFacultiesByNameOrColor(name, color);
-        }
-        if (name != null) {
-            return facultyService.findFacultiesByNameOrColor(name, "");
-        }
-        if (color != null) {
-            return facultyService.findFacultiesByColor(color);
-        }
-        return List.of();
+        return facultyService.findFacultiesByNameOrColor(name, color);
+    }
+
+    @GetMapping("/{id}/students")
+    public List<Student> getStudentsByFaculty(@PathVariable Long id) {
+        facultyService.findFacultyById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Факультет с id " + id + " не найден"));
+        return facultyService.findStudentsByFacultyId(id);
     }
 }
