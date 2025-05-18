@@ -43,4 +43,15 @@ public class StudentService {
         return studentRepository.findById(studentId)
                 .map(Student::getFaculty);
     }
+    public Integer getTotalCountOfStudents() {
+        return studentRepository.getTotalCountOfStudents();
     }
+
+    public Double getAverageAgeOfStudents() {
+        return studentRepository.getAverageAgeOfStudents();
+    }
+
+    public List<Student> findLastFiveStudents() {
+        return studentRepository.findLastFiveStudents();
+    }
+}
