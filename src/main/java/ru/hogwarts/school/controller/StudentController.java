@@ -63,4 +63,19 @@ public class StudentController {
         return studentService.findFacultyByStudentId(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Факультет для студента с id " + id + " не найден (возможно, студент или факультет не существуют)"));
     }
+
+    @GetMapping("/count")
+    public Integer getStudentsCount() {
+        return studentService.getTotalCountOfStudents();
+    }
+
+    @GetMapping("/avg-age")
+    public Double getStudentsAverageAge() {
+        return studentService.getAverageAgeOfStudents();
+    }
+
+    @GetMapping("/last-five")
+    public List<Student> getLastFiveStudents() {
+        return studentService.findLastFiveStudents();
+    }
 }
