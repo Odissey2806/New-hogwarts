@@ -1,6 +1,8 @@
 package ru.hogwarts.school.service;
 
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,6 +26,8 @@ import static java.nio.file.StandardOpenOption.CREATE_NEW;
 @Transactional
 public class AvatarService {
 
+    private static final Logger logger = LoggerFactory.getLogger(AvatarService.class);
+
     private final AvatarRepository avatarRepository;
     private final StudentRepository studentRepository;
     private final String avatarsDir;
@@ -38,10 +42,14 @@ public class AvatarService {
     }
 
     public void uploadAvatar(Long studentId, MultipartFile avatarFile) throws IOException {
+        logger.info("Был вызван метод для загрузки аватара для студента с id = {}", studentId);
         Student student = studentRepository.findById(studentId)
-                .orElseThrow(() -> new ResourceNotFoundException("Студент с id " + studentId + " не найден"));
+                .orElseThrow(() -> {
+                    logger.error("Студент с id = {} не найден", studentId);
+                    return new ResourceNotFoundException("Студент с id " + studentId + " не найден");
+                });
 
-        Path filePath = Paths.get(avatarsDir, studentId + "." + getExtension(avatarFile.getOriginalFilename()));;
+        Path filePath = Paths.get(avatarsDir, studentId + "." + getExtension(avatarFile.getOriginalFilename()));
         Files.createDirectories(filePath.getParent());
         Files.deleteIfExists(filePath);
 
@@ -67,25 +75,34 @@ public class AvatarService {
         avatar.setData(avatarFile.getBytes());
 
         avatarRepository.save(avatar);
+        logger.debug("Аватар для студента с id = {} успешно сохранен", studentId);
     }
 
 
     private String getExtension(String fileName) {
+        logger.debug("Получение расширения файла для {}", fileName);
         if (fileName == null || fileName.lastIndexOf(".") + 1 == fileName.length()) {
+            logger.warn("Имя файла null или не содержит расширения: {}", fileName);
             return "";
         }
         return fileName.substring(fileName.lastIndexOf(".") + 1);
     }
 
-
     public Avatar findAvatar(Long avatarId) {
+        logger.info("Был вызван метод для поиска аватара по id = {}", avatarId);
         return avatarRepository.findById(avatarId)
-                .orElseThrow(() -> new ResourceNotFoundException("Аватар с id " + avatarId + " не найден"));
+                .orElseThrow(() -> {
+                    logger.error("Аватар с id = {} не найден", avatarId);
+                    return new ResourceNotFoundException("Аватар с id " + avatarId + " не найден");
+                });
     }
 
     public Page<Avatar> getAllAvatars(int page, int size) {
+        logger.info("Был вызван метод для получения всех аватаров, страница = {}, размер = {}", page, size);
+        if (page < 0 || size <= 0) {
+            logger.warn("Некорректные параметры пагинации: страница={}, размер={}", page, size);
+        }
         PageRequest pageRequest = PageRequest.of(page, size);
         return avatarRepository.findAll(pageRequest);
     }
-
 }
