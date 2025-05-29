@@ -62,4 +62,10 @@ public class FacultyController {
                 .orElseThrow(() -> new ResourceNotFoundException("Факультет с id " + id + " не найден"));
         return facultyService.findStudentsByFacultyId(id);
     }
+
+    @GetMapping("/longest-name")
+    public String getFacultyWithLongestName() {
+        return facultyService.getFacultyWithLongestName();
+    }
 }
+
