@@ -88,4 +88,55 @@ public class StudentController {
     public Double getAverageAge() {
         return studentService.getAverageAge();
     }
+
+    @GetMapping("/print-parallel")
+    public void printStudentsParallel() {
+        List<Student> students = studentService.findLastFiveStudents();
+
+        System.out.println(students.get(0).getName());
+        System.out.println(students.get(1).getName());
+
+        Thread thread1 = new Thread(() -> {
+            System.out.println(students.get(2).getName());
+            System.out.println(students.get(3).getName());
+        });
+
+        Thread thread2 = new Thread(() -> {
+            System.out.println(students.get(4).getName());
+            if (students.size() > 5) {
+                System.out.println(students.get(5).getName());
+            }
+        });
+
+        thread1.start();
+        thread2.start();
+    }
+
+    private synchronized void printStudentName(String name) {
+        System.out.println(name);
+    }
+
+    @GetMapping("/print-synchronized")
+    public void printStudentsSynchronized() {
+        List<Student> students = studentService.findLastFiveStudents();
+
+        printStudentName(students.get(0).getName());
+        printStudentName(students.get(1).getName());
+
+        Thread thread1 = new Thread(() -> {
+            printStudentName(students.get(2).getName());
+            printStudentName(students.get(3).getName());
+        });
+
+        Thread thread2 = new Thread(() -> {
+            printStudentName(students.get(4).getName());
+            if (students.size() > 5) {
+                printStudentName(students.get(5).getName());
+            }
+        });
+
+        thread1.start();
+        thread2.start();
+    }
 }
+
