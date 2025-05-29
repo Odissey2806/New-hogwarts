@@ -95,4 +95,20 @@ public class StudentService {
         logger.debug("Найдено {} последних студентов", students.size());
         return students;
     }
+
+        public List<String> getStudentNamesStartingWithA() {
+            return studentRepository.findAll().stream()
+                    .map(Student::getName)
+                    .filter(name -> name.toUpperCase().startsWith("A")) // Я чуть лучше фильтр поставил
+                    .map(String::toUpperCase)
+                    .sorted()
+                    .toList();
+        }
+
+        public Double getAverageAge() {
+            return studentRepository.findAll().stream()
+                    .mapToInt(Student::getAge)
+                    .average()
+                    .orElse(0.0);
+    }
 }
